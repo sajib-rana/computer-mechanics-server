@@ -80,8 +80,16 @@ async function run() {
       });
 
       // booking related API
-       app.get("/bookings", async (req, res) => {
-         console.log(req.query.email);
+       app.get("/bookings", verifyJWT, async (req, res) => {
+         const decoded = req.decoded;
+         console.log("came back after verify", decoded);
+
+         if (decoded.email !== req.query.email) {
+           return res
+             .status(403)
+             .send({ error: 1, message: "forbidden access" });
+         }
+
          let query = {};
          if (req.query?.email) {
            query = { email: req.query.email };
